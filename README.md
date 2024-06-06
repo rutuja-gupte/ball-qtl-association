@@ -74,7 +74,7 @@ library(vcfR)
 Reading the data and displaying some basic information
 
 ``` r
-vcf_raw <- system.file("extdata", "pinf_sc50.vcf.gz", package = "pinfsc50") 
+vcf_raw <- system.file("extdata", "pinf_sc50.vcf.gz", package = "pinfsc50")
 vcf_raw <- read.vcfR(vcf_raw)
 ```
 
@@ -97,18 +97,10 @@ vcf_raw <- read.vcfR(vcf_raw)
     ## All variants processed
 
 ``` r
-vcf_raw
-```
+## This part is for actual data files instead of pulling data from the package.
+# vcf_raw <- read.vcfR("ApeKI_7chromRef.vcf.gz")
+# vcf_raw
 
-    ## ***** Object of Class vcfR *****
-    ## 18 samples
-    ## 1 CHROMs
-    ## 22,031 variants
-    ## Object size: 22.4 Mb
-    ## 7.929 percent missing data
-    ## *****        *****         *****
-
-``` r
 gt_raw <- extract.gt(vcf_raw, element="GT")
 dim(gt_raw)
 ```
@@ -145,6 +137,7 @@ integer rownames and includes a format column. The later includes only
 the genotypes and is named by the chromosome and position.
 
 ``` r
+rm(gt_raw)
 vcf <- vcf_raw
 gt <- extract.gt(vcf, element="GT")
 
@@ -159,7 +152,8 @@ table(vcf@fix[,"CHROM"])
 
 ``` r
 # Needs to be modified based on how the dataset labels their chromosomes
-chromosomes <- scaffolds[str_detect(scaffolds, "^Supercontig")] 
+chromosomes <- scaffolds[str_detect(scaffolds, "^Supercontig")]
+# chromosomes <- scaffolds[str_detect(scaffolds, "group")] 
 chromosomes
 ```
 
@@ -172,8 +166,10 @@ bool_ser <- vcf@fix[, "CHROM"] %in% chromosomes
 vcf@gt <- vcf@gt[bool_ser,]
 vcf@fix <- vcf@fix[bool_ser,]
 
-# Sorting the chromosomes for numbering
-chromosomes <- sort(chromosomes)
+rm(bool_ser)
+
+# Sorting the chromosomes for numbering (sometimes causes more harm than good)
+# chromosomes <- sort(chromosomes)
 
 # Here I am assuming that we have all the chromosomes starting from 1. Needs additional modification if that is not the case.
 chromosomes
@@ -182,7 +178,7 @@ chromosomes
     ## [1] "Supercontig_1.50"
 
 ``` r
-for (val in 1:length(chromosomes)){
+for (val in 1:(length(chromosomes))){
   vcf@fix[vcf@fix[,"CHROM"] == chromosomes[val], "CHROM"] <- val
 }
 gt <- extract.gt(vcf, element="GT")
@@ -204,6 +200,177 @@ head(vcf@fix)
     ## [4,] "AC=3;AF=0.088;AN=34;BaseQRankSum=-3.812;ClippingRankSum=-0.084;DP=514;FS=0.000;InbreedingCoeff=0.5586;MLEAC=3;MLEAF=0.088;MQ=57.07;MQ0=0;MQRankSum=-6.942;QD=15.88;ReadPosRankSum=-0.670;SOR=0.765"
     ## [5,] "AC=3;AF=0.094;AN=32;BaseQRankSum=-4.806;ClippingRankSum=0.793;DP=509;FS=2.356;InbreedingCoeff=0.5896;MLEAC=3;MLEAF=0.094;MQ=57.40;MQ0=0;MQRankSum=-0.200;QD=15.38;ReadPosRankSum=-0.290;SOR=0.876" 
     ## [6,] "AC=3;AF=0.088;AN=34;BaseQRankSum=-4.788;ClippingRankSum=0.096;DP=508;FS=0.000;InbreedingCoeff=0.5423;MLEAC=3;MLEAF=0.088;MQ=58.89;MQ0=0;MQRankSum=-1.160;QD=17.58;ReadPosRankSum=-0.467;SOR=0.581"
+
+### Removing missing values
+
+There is no one way to do this. The sample dataset here is good enough
+that we can remove all rows with missing genotypes and still have a
+sizable dataset left over. But that may not always be the case. If it is
+not possible to remove all rows with missing values, a viable
+alternative is to remove some bad samples and then remove all rows with
+missing values. Ultimately, we need to end up with a dataset that has no
+missing values. GModel does not support missing values. GAPIT and PLINK
+do support missing values but may have different methods of processing
+the missing values during analysis leading to different results.
+
+Starting by quantifying and plotting missingness across samples in order
+to decide on the best strategy to filter the missing values. Followed by
+actually removing the bad samples with an arbitrary threshold.
+
+``` r
+# First looking at missingness across samples to identify any particularly bad samples.
+miss_sample <- apply(gt, 2, function(r)mean(is.na(r)))
+hist(miss_sample)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+# Setting an arbitrary threshold
+threshold = 0.2
+miss_sample[miss_sample>threshold]
+```
+
+    ##     P7722     t30-4 
+    ## 0.2191004 0.2801961
+
+``` r
+# Updating the vcf
+vcf@gt <- vcf@gt[, c("FORMAT", colnames(gt)[apply(gt, 2, function(r)mean(is.na(r)) < threshold)])]
+gt <- extract.gt(vcf, element="GT")
+dim(gt)
+```
+
+    ## [1] 22031    16
+
+Now quantifying and plotting missingness across variants. Then removing
+all rows with missing values. If there are too many variants with
+missing values, this code can be updated to set a tolerance for some
+amount of missingness or the previous chunk can be modified to remove
+more bad samples.
+
+``` r
+# Looking at missingness across variants.   
+miss_var <- apply(gt, 1, function(r)mean(is.na(r)))
+hist(miss_var)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+# Number of rows that will be leftover after removing the missing rows.
+sum(miss_var == 0)
+```
+
+    ## [1] 16648
+
+``` r
+# Updating the vcf
+vcf@gt <- vcf@gt[apply(gt, 1, function(r)(mean(is.na(r)) == 0)),]
+vcf@fix <- vcf@fix[apply(gt, 1, function(r)(mean(is.na(r)) == 0)),]
+
+gt <- extract.gt(vcf, element="GT")
+
+# Sanity check to see if it actually worked
+head(apply(gt, 2, function(r)mean(is.na(r))))
+```
+
+    ## BL2009P4_us23       DDR7602 IN2009T1_us22         LBUS5       NL07434 
+    ##             0             0             0             0             0 
+    ##        P10127 
+    ##             0
+
+``` r
+# Another sanity check to see if the dimensions are as expected.
+dim(gt)
+```
+
+    ## [1] 16648    16
+
+``` r
+# This is just a quick check to see if there are any genotypes where missing values are given by '.' which is a common practice in the VCF format.
+sum(str_detect(gt, "\\."), na.rm = TRUE)
+```
+
+    ## [1] 0
+
+Now looking at the updated VCF. At this step, it should say 0 percent
+missing data or you may have missed something.
+
+``` r
+vcf
+```
+
+    ## ***** Object of Class vcfR *****
+    ## 16 samples
+    ## 1 CHROMs
+    ## 16,648 variants
+    ## Object size: 17.4 Mb
+    ## 0 percent missing data
+    ## *****        *****         *****
+
+### Keeping only biallelic loci
+
+Biallelic loci are separated by ‘,’. So, I am trying to detect ‘,’ in
+the ALT column and removing rows with multiple alleles listed.
+
+``` r
+# Checking for NAs in the ALT column
+alt <- vcf@fix[,"ALT"]
+vcf@gt <- vcf@gt[!is.na(alt),]
+vcf@fix <- vcf@fix[!is.na(alt),]
+gt <- extract.gt(vcf, element="GT")
+dim(gt)
+```
+
+    ## [1] 16648    16
+
+``` r
+alt <- vcf@fix[,"ALT"]
+vcf@gt <- vcf@gt[!str_detect(alt,","),]
+vcf@fix <- vcf@fix[!str_detect(alt,","),]
+gt <- extract.gt(vcf, element="GT")
+
+vcf
+```
+
+    ## ***** Object of Class vcfR *****
+    ## 16 samples
+    ## 1 CHROMs
+    ## 16,375 variants
+    ## Object size: 16.9 Mb
+    ## 0 percent missing data
+    ## *****        *****         *****
+
+### Keeping only SNPs
+
+These softwares are mainly designed to work for SNPs
+
+``` r
+vcf <- extract.indels(vcf, return.indels = FALSE)
+vcf
+```
+
+    ## ***** Object of Class vcfR *****
+    ## 16 samples
+    ## 1 CHROMs
+    ## 14,643 variants
+    ## Object size: 15.3 Mb
+    ## 0 percent missing data
+    ## *****        *****         *****
+
+### Additional processing
+
+``` r
+colnames(vcf@gt) <- str_split_i(colnames(vcf@gt), "\\.", 1)
+```
+
+This object can be saved as a vcf file that can be used to make the
+other models.
+
+``` r
+write.vcf(vcf, "processed_vcf.vcf")
+```
 
 ## GModel
 
