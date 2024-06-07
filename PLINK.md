@@ -12,12 +12,12 @@ accounted for using flags.
 have to be integers.
 
 ``` r
-temp <- read.table("TASSEL_samples/mdp_traits2.txt")
-temp <- temp %>% mutate(across(3:ncol(temp), round))
-temp <- temp %>% mutate(
-    across(everything(), ~replace_na(.x, 0))
-  )
-write.table(temp, "TASSEL_samples/traits_final.txt", row.names=FALSE, col.names=FALSE, sep = "\t", quote=FALSE)
+# temp <- read.table("TASSEL_samples/mdp_traits2.txt")
+# temp <- temp %>% mutate(across(3:ncol(temp), round))
+# temp <- temp %>% mutate(
+#     across(everything(), ~replace_na(.x, 0))
+#   )
+# write.table(temp, "TASSEL_samples/traits_final.txt", row.names=FALSE, col.names=FALSE, sep = "\t", quote=FALSE)
 ```
 
 The main command that I would use to run PLINK is:
@@ -32,7 +32,9 @@ Move the .qassoc file into the working directory to visualize the data
 and make Manhattan plots. We will require the R package qqman.
 
 ``` r
-# plink <- read.table("GC_analysis.assoc", header = TRUE)
-# plink <- drop_na(plink)
-# manhattan(plink)
+plink <- read.table("sample/sample_analysis.qassoc", header = TRUE)
+plink <- drop_na(plink)
+manhattan(plink)
 ```
+
+![](PLINK_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->

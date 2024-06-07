@@ -38,7 +38,8 @@ hour to run.
 
 I am assuming that the vcf file has already been preprocessed according
 to the requirements of this function. The main assumptions being made
-here are: 1. Chromosomes are numbers and can be converted to integers  
+here are:  
+1. Chromosomes are numbers and can be converted to integers  
 2. There are no missing values  
 3. The phenotype file has 2 columns of names and no headers
 
@@ -89,7 +90,7 @@ run_gmodel <- function(vcf.name, pheno.name, f1 = "gmodel1.csv", f2 = "gmodel2.c
   t3 <- data.frame(var1 = str_split_i(colnames(gt), "\\.", 1))
   t3 <- left_join(t3, traits, by = c("var1"="V1"))
   t3 <- t3[, c(3:ncol(t3))]
-  t3 <- t3 %>% mutate(
+  t3 <- data.frame(t3) %>% mutate(
     across(everything(), ~replace_na(.x, 0))
   )
   write.table(t3, f3, sep=",", row.names = FALSE)
@@ -99,23 +100,23 @@ run_gmodel <- function(vcf.name, pheno.name, f1 = "gmodel1.csv", f2 = "gmodel2.c
 Testing the function here
 
 ``` r
-run_gmodel("TASSEL_samples/processed_vcf.vcf", "TASSEL_samples/mdp_traits2.txt", "TASSEL_samples/gmodel1.csv", "TASSEL_samples/gmodel2.csv", "TASSEL_samples/gmodel3.csv" )
+run_gmodel("sample/processed_vcf.vcf.gz", "sample/traits.txt", "sample/gmodel1.csv", "sample/gmodel2.csv", "sample/gmodel3.csv" )
 ```
 
     ## Scanning file to determine attributes.
     ## File attributes:
-    ##   meta lines: 10
-    ##   header_line: 11
-    ##   variant count: 510
-    ##   column count: 268
-    ## Meta line 10 read in.
+    ##   meta lines: 29
+    ##   header_line: 30
+    ##   variant count: 14643
+    ##   column count: 25
+    ## Meta line 29 read in.
     ## All meta lines processed.
     ## gt matrix initialized.
     ## Character matrix gt created.
-    ##   Character matrix gt rows: 510
-    ##   Character matrix gt cols: 268
+    ##   Character matrix gt rows: 14643
+    ##   Character matrix gt cols: 25
     ##   skip: 0
-    ##   nrows: 510
+    ##   nrows: 14643
     ##   row_num: 0
-    ## Processed variant: 510
+    ## Processed variant 1000Processed variant 2000Processed variant 3000Processed variant 4000Processed variant 5000Processed variant 6000Processed variant 7000Processed variant 8000Processed variant 9000Processed variant 10000Processed variant 11000Processed variant 12000Processed variant 13000Processed variant 14000Processed variant: 14643
     ## All variants processed

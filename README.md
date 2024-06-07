@@ -97,8 +97,8 @@ vcf_raw <- read.vcfR(vcf_raw)
     ## All variants processed
 
 ``` r
-## This part is for actual data files instead of pulling data from the package.
-# vcf_raw <- read.vcfR("ApeKI_7chromRef.vcf.gz")
+# # This part is for actual data files instead of pulling data from the package.
+# vcf_raw <- read.vcfR("GC1_round1/GC1_round1_gt.vcf")
 # vcf_raw
 
 gt_raw <- extract.gt(vcf_raw, element="GT")
@@ -139,6 +139,7 @@ the genotypes and is named by the chromosome and position.
 ``` r
 rm(gt_raw)
 vcf <- vcf_raw
+
 gt <- extract.gt(vcf, element="GT")
 
 # Checking the chromosome names to spot any contigs
@@ -153,7 +154,6 @@ table(vcf@fix[,"CHROM"])
 ``` r
 # Needs to be modified based on how the dataset labels their chromosomes
 chromosomes <- scaffolds[str_detect(scaffolds, "^Supercontig")]
-# chromosomes <- scaffolds[str_detect(scaffolds, "group")] 
 chromosomes
 ```
 
@@ -178,11 +178,9 @@ chromosomes
     ## [1] "Supercontig_1.50"
 
 ``` r
-for (val in 1:(length(chromosomes))){
+for (val in 0:(length(chromosomes))){
   vcf@fix[vcf@fix[,"CHROM"] == chromosomes[val], "CHROM"] <- val
 }
-gt <- extract.gt(vcf, element="GT")
-
 head(vcf@fix)
 ```
 
@@ -201,6 +199,11 @@ head(vcf@fix)
     ## [5,] "AC=3;AF=0.094;AN=32;BaseQRankSum=-4.806;ClippingRankSum=0.793;DP=509;FS=2.356;InbreedingCoeff=0.5896;MLEAC=3;MLEAF=0.094;MQ=57.40;MQ0=0;MQRankSum=-0.200;QD=15.38;ReadPosRankSum=-0.290;SOR=0.876" 
     ## [6,] "AC=3;AF=0.088;AN=34;BaseQRankSum=-4.788;ClippingRankSum=0.096;DP=508;FS=0.000;InbreedingCoeff=0.5423;MLEAC=3;MLEAF=0.088;MQ=58.89;MQ0=0;MQRankSum=-1.160;QD=17.58;ReadPosRankSum=-0.467;SOR=0.581"
 
+``` r
+# copying vcf into vcf_raw as a backup before the next step
+vcf_raw <- vcf
+```
+
 ### Removing missing values
 
 There is no one way to do this. The sample dataset here is good enough
@@ -218,6 +221,16 @@ to decide on the best strategy to filter the missing values. Followed by
 actually removing the bad samples with an arbitrary threshold.
 
 ``` r
+# This is here just to make it easier to rerun
+vcf <- vcf_raw
+dim(vcf@gt)
+```
+
+    ## [1] 22031    19
+
+``` r
+gt <- extract.gt(vcf, element="GT")
+
 # First looking at missingness across samples to identify any particularly bad samples.
 miss_sample <- apply(gt, 2, function(r)mean(is.na(r)))
 hist(miss_sample)
@@ -359,17 +372,14 @@ vcf
     ## 0 percent missing data
     ## *****        *****         *****
 
-### Additional processing
-
-``` r
-colnames(vcf@gt) <- str_split_i(colnames(vcf@gt), "\\.", 1)
-```
-
 This object can be saved as a vcf file that can be used to make the
 other models.
 
+*Important realization:* write.vcf writes a gzipped file by default. I
+had been using the wrong extension all along.
+
 ``` r
-write.vcf(vcf, "processed_vcf.vcf")
+write.vcf(vcf, "sample/processed_vcf.vcf.gz")
 ```
 
 ## GModel
