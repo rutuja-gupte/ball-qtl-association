@@ -24,6 +24,13 @@ The main command that I would use to run PLINK is:
 
     ./plink --vcf processed_vcf.vcf --double-id --pheno GC1_pheno.txt --mpheno 1  --assoc --out GC_analysis --allow-no-sex
 
+For multiple phenotypes:  
+(Putting this in here because I am terrible at guessing what the change
+would be - spoiler alert: it is not mpheno that changes, I need to throw
+in another flag)
+
+    ./plink --vcf TASSEL_samples_processed.vcf.gz --double-id --pheno TASSEL_samples_traits.txt --mpheno 1 --assoc --out TASSEL_samples --allow-no-sex --all-pheno
+
 The beauty of it all is that it works in both PowerShell and Linux. Make
 sure all the appropriate files are in the directory containing the
 executable PLINK file.
