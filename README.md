@@ -66,7 +66,6 @@ An extra step here is that I am using a sample VCF dataset from pinfsc50
 to demonstrate the steps. You do not need to install this package.
 
 ``` r
-library(pinfsc50)
 library(tidyverse)
 library(vcfR)
 ```
@@ -74,9 +73,6 @@ library(vcfR)
 Reading the data and displaying some basic information
 
 ``` r
-# vcf_raw <- system.file("extdata", "pinf_sc50.vcf.gz", package = "pinfsc50")
-# vcf_raw <- read.vcfR(vcf_raw)
-
 # This part is for actual data files instead of pulling data from the package.
 vcf_raw <- read.vcfR("gt5382/5382--4.vcf.gz")
 ```
@@ -493,6 +489,27 @@ vcf
     ## 0 percent missing data
     ## *****        *****         *****
 
+### Modifying the phenotype file
+
+Also converting all phenotypes to integers because PLINK needs all
+integers.
+
+``` r
+# Also removing samples for which we do not have phenotype information
+traits <- read.table("gt5382/5382--4.pheno_1100.txt")
+traits <- drop_na(traits)
+vcf@gt <- vcf@gt[, c("FORMAT", colnames(gt)[colnames(gt) %in% traits[,1]])]
+gt <- extract.gt(vcf, element="GT")
+dim(gt)
+```
+
+    ## [1] 1526  189
+
+``` r
+traits <- traits[traits[,1] %in% colnames(gt),]
+traits <- traits %>% mutate(across(3:ncol(traits), round))
+```
+
 This object can be saved as a vcf file that can be used to make the
 other models.
 
@@ -500,7 +517,8 @@ other models.
 had been using the wrong extension all along.
 
 ``` r
-write.vcf(vcf, "gt5382/processed_vcf.vcf.gz")
+write.vcf(vcf, "gt5382/gt5382_processed.vcf.gz")
+write.table(traits, "gt5382/gt5382_traits.txt", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 ```
 
 ## GModel

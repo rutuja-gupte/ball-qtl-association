@@ -22,7 +22,7 @@ have to be integers.
 
 The main command that I would use to run PLINK is:
 
-    ./plink --vcf processed_vcf.vcf --double-id --pheno GC1_pheno.txt --mpheno 1  --assoc --out GC_analysis --allow-no-sex
+    ./plink --vcf gt5382_processed.vcf.gz --double-id --pheno gt5382_traits.txt --mpheno 1 --assoc --out gt5382 --allow-no-sex
 
 For multiple phenotypes:  
 (Putting this in here because I am terrible at guessing what the change
@@ -39,7 +39,7 @@ Move the .qassoc file into the working directory to visualize the data
 and make Manhattan plots. We will require the R package qqman.
 
 ``` r
-plink <- read.table("sample/sample_analysis.qassoc", header = TRUE)
+plink <- read.table("gt5382/gt5382.qassoc", header = TRUE)
 plink <- drop_na(plink)
 manhattan(plink)
 ```

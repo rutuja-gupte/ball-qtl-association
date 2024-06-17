@@ -1,0 +1,6 @@
+Traits,1
+SignificanceLevel,0.00001
+SNP&ChromFile,gmodel1.csv
+MarkerFile,gmodel2.csv
+PhenotypeFile,gmodel3.csv
+OutputFile,out.csv

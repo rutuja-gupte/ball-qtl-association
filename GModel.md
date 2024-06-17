@@ -50,7 +50,7 @@ passed as an argument to GModel. “f4.csv” should be updated based on the
 number of phenotypes being studied.
 
 ``` r
-run_gmodel <- function(vcf.name, pheno.name, f1 = "gmodel1.csv", f2 = "gmodel2.csv", f3 = "gnodel3.csv"){
+run_gmodel <- function(vcf.name, pheno.name, f1 = "gmodel1.csv", f2 = "gmodel2.csv", f3 = "gmodel3.csv"){
   vcf <- read.vcfR(vcf.name)
   traits <- read.table(pheno.name)
   gt <- extract.gt(vcf, element="GT")
@@ -100,23 +100,26 @@ run_gmodel <- function(vcf.name, pheno.name, f1 = "gmodel1.csv", f2 = "gmodel2.c
 Testing the function here
 
 ``` r
-run_gmodel("sample/processed_vcf.vcf.gz", "sample/traits.txt", "sample/gmodel1.csv", "sample/gmodel2.csv", "sample/gmodel3.csv" )
+run_gmodel("gt5382/gt5382_processed.vcf.gz", "gt5382/gt5382_traits.txt", "gt5382/gmodel1.csv", "gt5382/gmodel2.csv", "gt5382/gmodel3.csv" )
 ```
 
     ## Scanning file to determine attributes.
     ## File attributes:
-    ##   meta lines: 29
-    ##   header_line: 30
-    ##   variant count: 14643
-    ##   column count: 25
-    ## Meta line 29 read in.
+    ##   meta lines: 5633
+    ##   header_line: 5634
+    ##   variant count: 1526
+    ##   column count: 198
+    ## Meta line 1000 read in.Meta line 2000 read in.Meta line 3000 read in.Meta line 4000 read in.Meta line 5000 read in.Meta line 5633 read in.
     ## All meta lines processed.
     ## gt matrix initialized.
     ## Character matrix gt created.
-    ##   Character matrix gt rows: 14643
-    ##   Character matrix gt cols: 25
+    ##   Character matrix gt rows: 1526
+    ##   Character matrix gt cols: 198
     ##   skip: 0
-    ##   nrows: 14643
+    ##   nrows: 1526
     ##   row_num: 0
-    ## Processed variant 1000Processed variant 2000Processed variant 3000Processed variant 4000Processed variant 5000Processed variant 6000Processed variant 7000Processed variant 8000Processed variant 9000Processed variant 10000Processed variant 11000Processed variant 12000Processed variant 13000Processed variant 14000Processed variant: 14643
+    ## Processed variant 1000Processed variant: 1526
     ## All variants processed
+
+Double check f4.csv here to make sure it has the right number of traits
+(especially important for multiple traits)
