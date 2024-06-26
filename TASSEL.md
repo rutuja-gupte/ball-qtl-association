@@ -21,6 +21,13 @@ cd into the new directory and check if it works
 
 ## File processing
 
+I am assuming that the vcf file has already been preprocessed according
+to the requirements of this function. The main assumptions being made
+here are:  
+1. Chromosomes are numbers and can be converted to integers  
+2. There are no missing values  
+3. The phenotype file has 2 columns of names and no headers
+
 ``` r
 traits <- read.table("gt5382/gt5382_traits.txt")
 traits <- traits[,-1]
