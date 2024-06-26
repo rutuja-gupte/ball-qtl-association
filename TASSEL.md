@@ -37,20 +37,6 @@ colnames(traits) <- cnames
 write.table(traits, "gt5382/gt5382_traits_final.txt", quote=FALSE, sep="\t", row.names=FALSE)
 ```
 
-For TASSEL, I still havent figured out how to properly get around the
-covariate thing. I am currently passing the phenotype file as covariate
-but that shouldnt be the case. This is the current way I am running it.
-I think it should be fine because I have the exclude last trait flag so
-I am hoping it just ignores all covariates.
+Running the model
 
-    ./run_pipeline.pl -fork1 -importGuess gt5382_processed.vcf.gz -fork2 -importGuess gt5382_traits_final.txt -fork3 -importGuess gt5382_traits_final.txt -excludeLastTrait -combine5 -input1 -input2 -input3 -intersect -FixedEffectLMPlugin -endPlugin -export glm_output
-
-*Hopefully better ways to do this*
-
-The following two give the same output
-
-The first one might be the better option
-
-    ./run_pipeline.pl -fork1 -importGuess gt5382_processed.vcf.gz -fork2 -importGuess gt5382_traits_final.txt -combine3 -input1 -input2 -intersect -FixedEffectLMPlugin -endPlugin -export gt5382_outputtest1
-
-    ./run_pipeline.pl -fork1 -importGuess gt5382_processed.vcf.gz -fork2 -importGuess gt5382_traits_final.txt -fork3 -importGuess gt5382_traits_final.txt -excludeLastTrait -combine5 -input1 -input2 -input3 -intersect -FixedEffectLMPlugin -endPlugin -export gt5382_outputtest2
+    ./run_pipeline.pl -fork1 -importGuess gt5382_processed.vcf.gz -fork2 -importGuess gt5382_traits_final.txt -combine3 -input1 -input2 -intersect -FixedEffectLMPlugin -endPlugin -export gt5382_

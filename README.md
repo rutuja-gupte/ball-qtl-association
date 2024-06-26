@@ -491,9 +491,6 @@ vcf
 
 ### Modifying the phenotype file
 
-Also converting all phenotypes to integers because PLINK needs all
-integers.
-
 ``` r
 # Also removing samples for which we do not have phenotype information
 traits <- read.table("gt5382/5382--4.pheno_1100.txt")
@@ -507,7 +504,6 @@ dim(gt)
 
 ``` r
 traits <- traits[traits[,1] %in% colnames(gt),]
-traits <- traits %>% mutate(across(3:ncol(traits), round))
 ```
 
 This object can be saved as a vcf file that can be used to make the
