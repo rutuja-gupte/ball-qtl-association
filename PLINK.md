@@ -26,9 +26,6 @@ have done so far. Even within the common pre-processing, if you do not
 want to do some of that, it is totally fine because that can be
 accounted for using flags.
 
-*Important note:* PLINK does not allow floating point phenotypes. They
-have to be integers.
-
 The main command that I would use to run PLINK is:
 
     ./plink2 --vcf gt5382_processed.vcf.gz --double-id --pheno gt5382_traits.txt --glm allow-no-covars --pca 5 --out gt5382 --autosome-num 8
