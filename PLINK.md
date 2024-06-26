@@ -39,12 +39,17 @@ The beauty of it all is that it works in both PowerShell and Linux. Make
 sure all the appropriate files are in the directory containing the
 executable PLINK file.
 
-Move the .qassoc file into the working directory to visualize the data
-and make Manhattan plots. We will require the R package qqman.
+Move the .PHENO1.glm file into the working directory to visualize the
+data and make Manhattan plots. We will require the R package qqman.
 
 ``` r
-plink <- read.table("gt5382/gt5382.qassoc", header = TRUE)
+plink <- read.table("gt5382/gt5382.PHENO1.glm.linear", header = TRUE)
+colnames(plink) <- c("CHROM",   "POS",  "ID",   "REF",  "ALT",  "PROVISIONAL_REF",  "A1",   "OMITTED",  "A1_FREQ",  "TEST", "OBS_CT",   "BETA", "SE",   "T_STAT",   "P",    "ERRCODE")
 plink <- drop_na(plink)
+plink$CHR <- plink$CHROM
+plink$BP <- plink$POS
+plink$SNP <- paste(plink$CHROM, "_", plink$POS, sep="")
+plink$method <- "PLINK"
 manhattan(plink)
 ```
 
