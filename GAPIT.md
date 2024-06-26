@@ -24,6 +24,13 @@ prepare all the required files and immediately run GAPIT since the
 entire process can be done in R. It will generate multiple files and
 will give warnings. (But that is mainly a version and deprecation issue)
 
+I am assuming that the vcf file has already been preprocessed according
+to the requirements of this function. The main assumptions being made
+here are:  
+1. Chromosomes are numbers and can be converted to integers  
+2. There are no missing values  
+3. The phenotype file has 2 columns of names and no headers
+
 *Important note:* GAPIT does support missing values
 
 ``` r
@@ -609,11 +616,11 @@ run_gapit("gt5382/gt5382_processed.vcf.gz", "gt5382/gt5382_traits.txt", "gt5382/
     ## [1] "seqQTN:"
     ## [1]  816  748   74   71  116 1339  534  101   63
     ## [1] "LD.time(sec):"
-    ## [1] 0.00 0.00 0.00 0.00 0.00 0.02
-    ## [1] "BIC.time(sec):"
     ## [1] 0 0 0 0 0 0
+    ## [1] "BIC.time(sec):"
+    ## [1] 0.00 0.00 0.00 0.00 0.02 0.00
     ## [1] "GLM.time(sec):"
-    ## [1] 1.05 1.03 1.05 1.03 1.02 1.03
+    ## [1] 1.01 1.03 1.05 0.97 1.11 1.16
     ## [1] "-------------Blink finished successfully in 9.69 seconds!-----------------"
     ## [1] "Calculating Original GWAS result..."
     ## [1] "GAPIT.RandomModel beginning..."
