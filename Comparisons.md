@@ -1,4 +1,4 @@
-Model Comparison
+Model Comparisons
 ================
 Rutuja Gupte
 
