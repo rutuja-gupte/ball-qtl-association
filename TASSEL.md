@@ -29,12 +29,11 @@ here are:
 3. The phenotype file has 2 columns of names and no headers
 
 ``` r
-traits <- read.table("gt5382/gt5382_traits.txt")
-traits <- traits[,-1]
+traits <- read.table("traits.txt")
 cnames <- colnames(traits)
 cnames[1] <- "<Trait>"
 colnames(traits) <- cnames
-write.table(traits, "gt5382/gt5382_traits_final.txt", quote=FALSE, sep="\t", row.names=FALSE)
+write.table(traits, "traits_final.txt", quote=FALSE, sep="\t", row.names=FALSE)
 ```
 
 Running the model
