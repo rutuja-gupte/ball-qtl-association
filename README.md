@@ -1,6 +1,6 @@
 QTL Association
 ================
-Rutuja Gupte
+Author: Rutuja Gupte
 
 This is a guide to using 5 different software for genetic association
 testing. The original guides of all the software are linked at the
